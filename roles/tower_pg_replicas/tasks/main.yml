@@ -1,0 +1,58 @@
+---
+- name: copy packages
+  copy:
+    src: /var/lib/tower-bundle
+    dest: /var/lib/
+
+- name: configure repository
+  copy:
+    src: files/ansible-tower.repo
+    dest: /etc/yum.repos.d/
+
+- name: copy rpm gpg keys
+  copy:
+    src: files/GPG-KEYS/
+    dest: /etc/pki/rpm-gpg/
+
+- name: install postgresql server
+  yum: 
+    name: "{{ pg_server }}"
+    state: present
+
+- name: accept slave connection in master
+  lineinfile:
+    line: 'host   replication replica    {{ item }}/32       md5'
+    path: "{{ pg_data_path }}/pg_hba.conf"
+  with_items: "{{ ansible_all_ipv4_addresses }}"
+  delegate_to: "{{ groups.pg_master[0] }}"
+
+- name: restart master
+  service: 
+    name: "{{ pg_service }}"
+    state: restarted
+  delegate_to: "{{ groups.pg_master[0] }}"
+  
+- name: copy database
+  shell: "export PGPASSWORD={{ replica_pass }} && pg_basebackup -h {{ groups.pg_master[0] }} -U replica -D {{ pg_data_path }} -P --xlog"
+  become: yes
+  become_method: su
+  become_user: postgres
+
+- name: configure hot standby
+  lineinfile:
+    line: 'hot_standby = on'
+    path: "{{ pg_data_path }}/postgresql.conf"
+
+- name: create recovery config
+  template:
+    src: recovery.j2
+    dest: "{{ pg_data_path }}/recovery.conf"
+    mode: 0600
+    owner: postgres
+    group: postgres
+
+- name: start replica
+  service:
+    name: "{{ pg_service }}"
+    state: started
+    enabled: true

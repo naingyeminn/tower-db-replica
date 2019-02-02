@@ -1,0 +1,10 @@
+---
+- name: setup master for replicas
+  hosts: pg_master
+  roles:
+    - tower_pg_master
+
+- name: setup replicas
+  hosts: pg_replicas
+  roles:
+    - tower_pg_replicas

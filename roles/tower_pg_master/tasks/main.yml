@@ -1,0 +1,25 @@
+---
+- name: include custom config
+  lineinfile:
+    line: "include_dir = 'conf.d'"
+    path: "{{ pg_data_path }}/postgresql.conf"
+
+- name: create custom config directory
+  file:
+    path: "{{ pg_data_path }}/conf.d"
+    state: directory
+
+- name: create config
+  template:
+    src: tower-postgresql.j2
+    dest: "{{ pg_data_path }}/conf.d/tower-postgresql.conf"
+
+- name: create replica user
+  postgresql_user:
+    name: replica
+    password: "{{ replica_pass }}"
+    role_attr_flags: REPLICATION
+    state: present
+  become: yes
+  become_method: su
+  become_user: postgres

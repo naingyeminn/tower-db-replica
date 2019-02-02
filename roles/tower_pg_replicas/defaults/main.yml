@@ -1,0 +1,5 @@
+---
+replica_pass: 'R3dH@tT0w3r'
+pg_data_path: '/var/lib/pgsql/9.6/data'
+pg_server: 'postgresql96-server'
+pg_service: 'postgresql-9.6'

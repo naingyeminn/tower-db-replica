@@ -1,0 +1,13 @@
+wal_level = hot_standby
+
+synchronous_commit = local
+
+archive_mode = on
+
+archive_command = 'cp %p /var/lib/pgsql/9.6/data/archive/%f'
+
+max_wal_senders = 2
+
+wal_keep_segments = 10
+
+synchronous_standby_names = '{% for rep in groups.pg_replicas %}{{ rep }}{% if not loop.last %},{% endif %}{% endfor %}'

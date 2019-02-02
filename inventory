@@ -1,0 +1,5 @@
+[pg_master]
+pgsqlsrv01
+
+[pg_replicas]
+pgsqlsrv02

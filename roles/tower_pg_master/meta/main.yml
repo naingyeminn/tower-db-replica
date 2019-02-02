@@ -1,0 +1,13 @@
+galaxy_info:
+  author: Naing Ye Minn
+  description: PostgreSQL DB Master for Ansible Tower
+  company: Myanmar Open Source Community
+
+  license: license (MIT)
+
+  min_ansible_version: 2.4
+
+  platforms:
+    - name: RHEL
+      versions:
+        - 7

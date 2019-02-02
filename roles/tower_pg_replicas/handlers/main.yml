@@ -1,0 +1,6 @@
+---
+- name: restart master
+  service: 
+    name: "{{ pg_service }}"
+    state: restarted
+  delegate_to: "{{ groups.pg_master[0] }}"
